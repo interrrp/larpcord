@@ -179,6 +179,8 @@ async def launch_larper(slug, metadata, system_prompt):
 
     @bot.event
     async def on_message(message: Message):
+        nonlocal activated, context
+
         if (
             not activated
             or message.author.id == bot.user.id
@@ -194,8 +196,7 @@ async def launch_larper(slug, metadata, system_prompt):
         async with message.channel.typing():
             invocation = await agent.ainvoke({"messages": context})
 
-        context.clear()
-        context.extend(invocation["messages"])
+        context = invocation["messages"]
         response = context[-1].content
 
         if "I_DO_NOT_WANT_TO_RESPOND" in response:
@@ -213,7 +214,7 @@ async def launch_larper(slug, metadata, system_prompt):
 
     @bot.slash_command(description=f"Make {metadata['name']} stop responding")
     async def deactivate(interaction: AppCmdInter):
-        global activated
+        nonlocal activated
         if not activated:
             await interaction.response.send_message("I was already deactivated")
             return
@@ -222,7 +223,7 @@ async def launch_larper(slug, metadata, system_prompt):
 
     @bot.slash_command(description=f"Make {metadata['name']} start responding")
     async def activate(interaction: AppCmdInter):
-        global activated
+        nonlocal activated
         if activated:
             await interaction.response.send_message("I was already activated")
             return
