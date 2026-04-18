@@ -6,7 +6,7 @@ Personally I use it to make AI girlfriends but maybe you have a better use case.
 
 Each bot should have a Markdown definition file in `definitions/`, containing its name, trigger phrases, and Discord bot token. For example, the definition of a John bot in `definitions/john.md` would be:
 
-```toml
+```md
 +++
 name = "John"
 trigger_phrases = ["john", "jon", "jone"]
