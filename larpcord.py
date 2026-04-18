@@ -219,7 +219,7 @@ async def launch_larper(slug, metadata, system_prompt):
             await interaction.response.send_message("I was already deactivated")
             return
         activated = False
-        await interaction.response.send_message("Deactivated.")
+        await interaction.response.send_message("Deactivated")
 
     @bot.slash_command(description=f"Make {metadata['name']} start responding")
     async def activate(interaction: AppCmdInter):
