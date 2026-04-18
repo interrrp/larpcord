@@ -161,6 +161,8 @@ async def launch_larper(slug, metadata, system_prompt):
     except Exception:
         context = []
 
+    activated = True
+
     @bot.event
     async def on_ready():
         print(f"{bot.user} is ready")
@@ -177,7 +179,11 @@ async def launch_larper(slug, metadata, system_prompt):
 
     @bot.event
     async def on_message(message: Message):
-        if message.author.id == bot.user.id or not should_respond_to(message):
+        if (
+            not activated
+            or message.author.id == bot.user.id
+            or not should_respond_to(message)
+        ):
             return
 
         context_message = HumanMessage(MESSAGE_TEMPLATE.format(message=message))
@@ -204,6 +210,24 @@ async def launch_larper(slug, metadata, system_prompt):
         context.clear()
         context_path.write_bytes(pickle.dumps(context))
         await interaction.response.send_message("Cleared context")
+
+    @bot.slash_command(description=f"Make {metadata['name']} stop responding")
+    async def deactivate(interaction: AppCmdInter):
+        global activated
+        if not activated:
+            await interaction.response.send_message("I was already deactivated")
+            return
+        activated = False
+        await interaction.response.send_message("Deactivated.")
+
+    @bot.slash_command(description=f"Make {metadata['name']} start responding")
+    async def activate(interaction: AppCmdInter):
+        global activated
+        if activated:
+            await interaction.response.send_message("I was already activated")
+            return
+        activated = True
+        await interaction.response.send_message("Activated")
 
     await bot.start(metadata["token"])
 
